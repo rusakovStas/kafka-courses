@@ -40,13 +40,18 @@ public class PullConsumer {
     }
 
     public void pull(Consumer<ConsumerRecord<String, Message>> handleMsgs) {
-        consumer.poll(Duration.ofMillis(10_000)).forEach((record) -> {
-            handleMsgs.accept(record);
-            //вызываем ручной коммит после успешной обработки сообщения
-            Map<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
-            offsets.put(new TopicPartition(record.topic(), record.partition()),
-                    new OffsetAndMetadata(record.offset() + 1)); // +1, так как смещение указывает на следующее сообщение
-            consumer.commitSync(offsets);
-        });
+        try {
+            consumer.poll(Duration.ofMillis(10_000)).forEach((record) -> {
+                handleMsgs.accept(record);
+                //вызываем ручной коммит после успешной обработки сообщения
+                Map<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
+                offsets.put(new TopicPartition(record.topic(), record.partition()),
+                        new OffsetAndMetadata(record.offset() + 1)); // +1, так как смещение указывает на следующее сообщение
+                consumer.commitSync(offsets);
+            });
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
     }
 }
