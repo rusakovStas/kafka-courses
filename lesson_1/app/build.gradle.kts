@@ -3,6 +3,7 @@ plugins {
     id("java")
     id("application")
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm")
 }
 
 group = "ydx.practicum"
@@ -18,6 +19,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.test {
@@ -26,4 +28,7 @@ tasks.test {
 
 application {
     mainClass.set("ydx.practicum.Main") // замените на название вашего главного класса
+}
+kotlin {
+    jvmToolchain(8)
 }

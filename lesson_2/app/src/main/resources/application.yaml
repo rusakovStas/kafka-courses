@@ -1,0 +1,17 @@
+spring:
+  application:
+    name=app
+kafka:
+  topic-for-messages-name: messages
+  topic-for-block-user: blocked-users
+  topic-for-blacklist-word: black-list-words
+  topic-for-blocked-messages: blocked-messages
+  store-for-blacklist-user: blacklist-user-store
+  store-for-blacklist-word: blacklist-word-store
+  key-for-blacklist-words: key-for-blacklist-words
+  partitions: 1
+  replication-factor: 1
+  bootstrap-servers: localhost:9094,localhost:9095,localhost:9096
+
+server:
+  port: 8002
