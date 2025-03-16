@@ -136,7 +136,7 @@ public class KafkaConfig {
      * Создаем поток из топика в который кладем запрещенные слова
      * */
     @Bean
-    public KStream<String, Set<String>> blackListWordsStream(StreamsBuilder streamsBuilder) {
+    public KTable<String, Set<String>> blackListWordsStream(StreamsBuilder streamsBuilder) {
         //создаем поток из топика сообщений о запрещенных словах
         KStream<String, String> streamForBlackListWords = streamsBuilder.stream(
                 kafkaProperties.getTopicForBlacklistWord(),
@@ -156,6 +156,6 @@ public class KafkaConfig {
                         Materialized.<String, Set<String>, KeyValueStore<Bytes, byte[]>>as(kafkaProperties.getStoreForBlacklistWord())
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(new JsonSerde<>(Set.class))
-                ).toStream();
+                );
     }
 }
