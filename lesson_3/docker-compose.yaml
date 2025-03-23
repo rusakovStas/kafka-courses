@@ -74,6 +74,7 @@ services:
    environment:
     KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka-0:9092
     KAFKA_CLUSTERS_0_NAME: kraft
+    cdSQLDBSERVER: http://ksqldb:8088
    networks:
     - proxynet  
 
@@ -148,6 +149,12 @@ services:
 
 
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081/'
+      # Export JMX metrics to :9876/metrics for Prometheus
+      KAFKA_JMX_PORT: '9875'
+      KAFKA_OPTS: "-javaagent:/opt/jmx_prometheus_javaagent-0.15.0.jar=9876:/opt/kafka-connect.yml"
+      # Read connection password from file
+      CONNECT_CONFIG_PROVIDERS: "file"
+      CONNECT_CONFIG_PROVIDERS_FILE_CLASS: "org.apache.kafka.common.config.provider.FileConfigProvider"
 
 
       CONNECT_PLUGIN_PATH: /usr/share/java,/etc/kafka-connect/jars
@@ -156,6 +163,25 @@ services:
     networks:
       - proxynet
 
+  prometheus:
+    image: prom/prometheus:v2.30.3
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
+    links:
+      - kafka-connect
+    networks:
+      - proxynet
+
+  grafana:
+    build:
+      context: ./grafana
+    ports:
+      - 3000:3000
+    networks:
+      - proxynet
 
 networks:
  proxynet:
