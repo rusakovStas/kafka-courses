@@ -1,11 +1,9 @@
 Для старта всех контейнеров
 
-`
-docker compose up -d
-`
+` docker compose up -d `
 
 Затем необходимо наполнить базу данных: 
-`
+```
 docker exec -it postgres psql -h 127.0.0.1 -U postgres-user -d customers
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -38,7 +36,7 @@ INSERT INTO orders (user_id, product_name, quantity) VALUES (3, 'Product D', 3);
 INSERT INTO orders (user_id, product_name, quantity) VALUES (4, 'Product E', 4);
 
 exit
-`
+```
 
 
 Команда для конфигурации Kafka Connect (настройки будут взяты из файла connector.json в этой папке)
@@ -46,17 +44,17 @@ exit
 `curl -X PUT -H 'Content-Type: application/json' --data @connector.json http://localhost:8083/connectors/pg-connector/config`
 
 После этого можно открыть kafka ui 
-http://localhost:8080/ui/clusters/kraft/all-topics?perPage=25
+`http://localhost:8080/ui/clusters/kraft/all-topics?perPage=25`
 
 в топиках customers.public.users и customers.public.orders будут сообщения реплецирующие данные которые вставлены выше
 
 Для просмотра Prometeus 
-http://localhost:9090/classic/graph 
+`http://localhost:9090/classic/graph`
 
 Для просмотра Grafany 
-http://localhost:3000/dashboard/import
+`http://localhost:3000/dashboard/import`
 
 Нажимаем Upload Json file 
-и выбираем lesson3/grafana/dashboards/connect.json 
+и выбираем ./lesson3/grafana/dashboards/connect.json
 Указываем названия и создаем дашборд
 
