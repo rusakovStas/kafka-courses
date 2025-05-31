@@ -37,11 +37,12 @@ services:
    ports:
      - "9092:9092"
      - "9093:9093"
+     - "1003:1003"
    networks:
      - confluent
    volumes:
      - data-kafka-1:/var/lib/kafka/data
-     - ./kafka-1-creds:/etc/kafka/jaas
+     - ./kafka-1-creds:/etc/kafka/secrets
    environment:
      KAFKA_BROKER_ID: 1
      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -49,26 +50,22 @@ services:
      KAFKA_DELETE_TOPIC_ENABLE: true
      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
      
-     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,SASL_PLAINTEXT://0.0.0.0:9093
-     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,SASL_PLAINTEXT://kafka-1:9093
-     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, SASL_PLAINTEXT:SASL_PLAINTEXT
+     KAFKA_LISTENERS: PLAINTEXT://:9092,SASL_PLAINTEXT://:9093,EXTERNAL_SASL_PLAINTEXT://:1003
+     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,SASL_PLAINTEXT://kafka-1:9093,EXTERNAL_SASL_PLAINTEXT://localhost:1003
+     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,EXTERNAL_SASL_PLAINTEXT:SASL_PLAINTEXT
+     KAFKA_LISTENER_NAME_BROKER_SASL_ENABLED_MECHANISMS: PLAIN
      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
-     KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-     KAFKA_OPTS: 
-      -Djava.security.auth.login.config=/etc/kafka/jaas/kafka_server_jaas.conf
+     KAFKA_ZOOKEEPER_SASL_CLIENT: true
+     KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+     KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+     KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+     KAFKA_SUPER_USERS: "User:ANONYMOUS;User:admin"
 
      KAFKA_SSL_KEYSTORE_FILENAME: kafka-1.keystore.jks
      KAFKA_SSL_KEYSTORE_CREDENTIALS: kafka-1_keystore_creds
      KAFKA_SSL_KEY_CREDENTIALS: kafka-1_sslkey_creds
      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.kafka-1.truststore.jks
      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: kafka-1_truststore_creds
-     KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
-     KAFKA_SSL_KEY_PASSWORD: password
-     # Включаем авторизацию (ACL)
-    #  KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-    #  KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "false"
-     # Кладём superuser'а, который сможет задавать ACL
-     KAFKA_SUPER_USERS: User:admin
 
 
  kafka-2:
@@ -81,11 +78,12 @@ services:
    ports:
      - "9094:9094"
      - "9095:9095"
+     - "1005:1005"
    networks:
      - confluent
    volumes:
      - data-kafka-2:/var/lib/kafka/data
-     - ./kafka-2-creds:/etc/kafka/jaas
+     - ./kafka-2-creds:/etc/kafka/secrets
    environment:
      KAFKA_BROKER_ID: 2
      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -93,25 +91,22 @@ services:
      KAFKA_DELETE_TOPIC_ENABLE: true
      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
      
-     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9094,SASL_PLAINTEXT://0.0.0.0:9095
-     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9094,SASL_PLAINTEXT://kafka-2:9095
-     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, SASL_PLAINTEXT:SASL_PLAINTEXT
+     KAFKA_LISTENERS: PLAINTEXT://:9094,SASL_PLAINTEXT://:9095,EXTERNAL_SASL_PLAINTEXT://:1005
+     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9094,SASL_PLAINTEXT://kafka-2:9095,EXTERNAL_SASL_PLAINTEXT://localhost:1005
+     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,EXTERNAL_SASL_PLAINTEXT:SASL_PLAINTEXT
      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-     KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/jaas/kafka_server_jaas.conf"
+     KAFKA_ZOOKEEPER_SASL_CLIENT: true
+     KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+     KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+     KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+     KAFKA_SUPER_USERS: "User:ANONYMOUS;User:admin"
      
      KAFKA_SSL_KEYSTORE_FILENAME: kafka-2.keystore.jks
      KAFKA_SSL_KEYSTORE_CREDENTIALS: kafka-2_keystore_creds
      KAFKA_SSL_KEY_CREDENTIALS: kafka-2_sslkey_creds
      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.kafka-2.truststore.jks
      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: kafka-2_truststore_creds
-     KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
-     KAFKA_SSL_KEY_PASSWORD: password
-     # Включаем авторизацию (ACL)
-    #  KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-    #  KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "false"
-     # Кладём superuser'а, который сможет задавать ACL
-     KAFKA_SUPER_USERS: User:admin
 
  kafka-3:
    image: confluentinc/cp-kafka:7.4.4
@@ -123,11 +118,12 @@ services:
    ports:
      - "9096:9096"
      - "9097:9097"
+     - "1007:1007"
    networks:
      - confluent
    volumes:
      - data-kafka-3:/var/lib/kafka/data
-     - ./kafka-3-creds:/etc/kafka/jaas
+     - ./kafka-3-creds:/etc/kafka/secrets
    environment:
      KAFKA_BROKER_ID: 3
      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -135,56 +131,23 @@ services:
      KAFKA_DELETE_TOPIC_ENABLE: true
      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
      
-     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9096,SASL_PLAINTEXT://0.0.0.0:9097
-     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9096,SASL_PLAINTEXT://kafka-3:9097
-     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, SASL_PLAINTEXT:SASL_PLAINTEXT
+     KAFKA_LISTENERS: PLAINTEXT://:9096,SASL_PLAINTEXT://:9097,EXTERNAL_SASL_PLAINTEXT://:1007
+     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9096,SASL_PLAINTEXT://kafka-3:9097,EXTERNAL_SASL_PLAINTEXT://localhost:1007
+     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,EXTERNAL_SASL_PLAINTEXT:SASL_PLAINTEXT
      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-     KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/jaas/kafka_server_jaas.conf"
+     KAFKA_ZOOKEEPER_SASL_CLIENT: true
+     KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+     KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+     KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+     KAFKA_SUPER_USERS: "User:ANONYMOUS;User:admin"
      
      KAFKA_SSL_KEYSTORE_FILENAME: kafka-3.keystore.jks
      KAFKA_SSL_KEYSTORE_CREDENTIALS: kafka-3_keystore_creds
      KAFKA_SSL_KEY_CREDENTIALS: kafka-3_sslkey_creds
      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.kafka-3.truststore.jks
      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: kafka-3_truststore_creds
-     KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
-     KAFKA_SSL_KEY_PASSWORD: password
-     # Включаем авторизацию (ACL)
-    #  KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-    #  KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "false"
-     # Кладём superuser'а, который сможет задавать ACL
-     KAFKA_SUPER_USERS: User:admin
 
-
-# на авторизации - не смог заставить работать( 
-#  kafka-ui:
-#     image: provectuslabs/kafka-ui:latest
-#     container_name: kafka-ui
-#     hostname: kafka-ui
-#     ports:
-#       - "8080:8080"
-#     depends_on:
-#       - kafka-1
-#       - kafka-2
-#       - kafka-3
-#     networks:
-#       - confluent
-#     environment:
-#       KAFKA_CLUSTERS_0_NAME: local
-#       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:9093,kafka-2:9095,kafka-3:9097
-#       KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper:2181"
-#       KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka-ui.truststore.jks
-#       KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_PASSWORD: password
-#       KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka-ui.keystore.jks
-#       KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_PASSWORD: password
-#       KAFKA_CLUSTERS_0_PROPERTIES_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
-      
-#       KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_PLAINTEXT
-#       KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: |
-#         org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret";
-
-#     volumes:
-#       - ./kafka-ui-creds:/etc/kafka/secrets
 
 
 volumes:
