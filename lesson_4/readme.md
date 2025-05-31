@@ -49,3 +49,25 @@ kafka-reassign-partitions --bootstrap-server localhost:9094 --reassignment-json-
 ![Синхронизация восстановилось](imgs/kafka-1-return.png)
 
 **Задание 2**
+Запускаем кластер
+```
+docker-compose up
+```
+
+Создаем юзеров
+```
+# login = admin   password = admin-secret
+docker exec -it kafka-1 kafka-configs --zookeeper zookeeper:2181 \
+  --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=admin-secret]' \
+  --entity-type users --entity-name admin
+
+# login = producer1   password = producer-secret
+docker exec -it kafka-1 kafka-configs --zookeeper zookeeper:2181 \
+  --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=producer-secret]' \
+  --entity-type users --entity-name producer1
+
+# login = consumer1
+docker exec -it kafka-1 kafka-configs --zookeeper zookeeper:2181 \
+  --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=consumer-secret]' \
+  --entity-type users --entity-name consumer1
+```
