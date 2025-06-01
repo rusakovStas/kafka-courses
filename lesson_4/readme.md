@@ -51,23 +51,19 @@ kafka-reassign-partitions --bootstrap-server localhost:9094 --reassignment-json-
 **Задание 2**
 Запускаем кластер
 ```
+cd certs
 docker-compose up
+cd ..
 ```
 
-Создаем юзеров
+Настраиваем топики 
 ```
-# login = admin   password = admin-secret
-docker exec -it kafka-1 kafka-configs --zookeeper zookeeper:2181 \
-  --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=admin-secret]' \
-  --entity-type users --entity-name admin
+chmod +x topic_and_acl.sh
+./topic_and_acl.sh 
+```
 
-# login = producer1   password = producer-secret
-docker exec -it kafka-1 kafka-configs --zookeeper zookeeper:2181 \
-  --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=producer-secret]' \
-  --entity-type users --entity-name producer1
-
-# login = consumer1
-docker exec -it kafka-1 kafka-configs --zookeeper zookeeper:2181 \
-  --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=consumer-secret]' \
-  --entity-type users --entity-name consumer1
+Запускаем приложение 
+```
+3. Собираем докер образ приложения ```docker build -t lesson4-app .```
+4. Запускаем приложение ```docker run --network host lesson4-app```
 ```
