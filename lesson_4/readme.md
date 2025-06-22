@@ -51,7 +51,7 @@ kafka-reassign-partitions --bootstrap-server localhost:9094 --reassignment-json-
 **Задание 2**
 Запускаем кластер
 ```
-cd certs
+cd task_2/certs
 docker-compose up
 cd ..
 ```
